@@ -1,223 +1,220 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Supplier Invoice Automation Module</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supplier Invoice Automation Module</title>
+    
+    <!-- Excel workbook reader/writer and browser file download library -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
-<!-- Excel workbook reader/writer -->
-<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-
-<style>
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f7fafc;
-    color: #2d3748;
-    margin: 0;
-    padding: 40px;
-}
-.container {
-    max-width: 1000px;
-    margin: 0 auto;
-    background: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0,0,0,.05);
-}
-h1 {
-    color: #1a365d;
-    margin-top: 0;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 10px;
-}
-.subtitle {
-    color: #4a5568;
-    font-size: 1.1em;
-    margin-bottom: 30px;
-}
-.grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    margin-bottom: 30px;
-}
-.upload-box {
-    border: 2px dashed #cbd5e0;
-    border-radius: 6px;
-    padding: 20px;
-    text-align: center;
-    background: #edf2f7;
-    position: relative;
-}
-.upload-box label {
-    display: block;
-    font-weight: bold;
-    color: #2b6cb0;
-    margin-bottom: 5px;
-}
-.upload-box input[type="file"] {
-    display: block;
-    width: 100%;
-    margin-top: 10px;
-}
-.file-name {
-    font-size: .9em;
-    color: #2f855a;
-    margin-top: 8px;
-    font-weight: bold;
-    overflow-wrap: anywhere;
-}
-.btn-container {
-    text-align: right;
-    margin-bottom: 30px;
-}
-button {
-    background: #2f855a;
-    color: white;
-    border: 0;
-    padding: 12px 24px;
-    font-size: 1.05em;
-    font-weight: bold;
-    border-radius: 6px;
-    cursor: pointer;
-}
-button:hover { background: #22543d; }
-button:disabled { opacity: .6; cursor: wait; }
-.panel {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 6px;
-    padding: 20px;
-    margin-top: 25px;
-}
-.terminal-box {
-    background: #1a202c;
-    color: #cbd5e0;
-    font-family: Consolas, monospace;
-    padding: 15px;
-    border-radius: 6px;
-    max-height: 300px;
-    overflow-y: auto;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-    font-size: .9em;
-    line-height: 1.5;
-}
-.terminal-box.error-state {
-    border-left: 4px solid #e53e3e;
-    background: #2d1212;
-    color: #fed7d7;
-}
-.metric-container {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 25px;
-}
-.metric-card {
-    background: #ebf8ff;
-    border-left: 4px solid #3182ce;
-    padding: 15px;
-    border-radius: 4px;
-    flex: 1;
-    min-width: 0;
-}
-.metric-title {
-    font-size: .85em;
-    color: #4a5568;
-    text-transform: uppercase;
-    font-weight: bold;
-}
-.metric-value {
-    font-size: 1.5em;
-    font-weight: bold;
-    color: #2b6cb0;
-    margin-top: 5px;
-}
-.status-box {
-    padding: 15px;
-    border-radius: 6px;
-    margin-bottom: 20px;
-    font-weight: bold;
-}
-.success { background: #c6f6d5; color: #22543d; }
-.warning { background: #feebc8; color: #744210; }
-.error { background: #fed7d7; color: #742a2a; }
-.download-links {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 15px;
-}
-.download-btn {
-    background: #3182ce;
-    color: white;
-    text-decoration: none;
-    padding: 10px 15px;
-    border-radius: 4px;
-    font-weight: bold;
-    display: inline-block;
-    width: fit-content;
-}
-@media (max-width: 650px) {
-    body { padding: 12px; }
-    .container { padding: 16px; }
-    .grid { grid-template-columns: 1fr; }
-    .metric-container { flex-direction: column; }
-    .btn-container { text-align: left; }
-}
-</style>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f7fafc;
+            color: #2d3748;
+            margin: 0;
+            padding: 40px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+        h1 {
+            color: #1a365d;
+            margin-top: 0;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+        p.subtitle {
+            color: #4a5568;
+            font-size: 1.1em;
+            margin-bottom: 30px;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .upload-box {
+            border: 2px dashed #cbd5e0;
+            border-radius: 6px;
+            padding: 20px;
+            text-align: center;
+            background: #edf2f7;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .upload-box:hover {
+            border-color: #3182ce;
+            background: #ebf8ff;
+        }
+        .upload-box label {
+            display: block;
+            font-weight: bold;
+            color: #2b6cb0;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .upload-box input[type="file"] {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-name {
+            font-size: 0.9em;
+            color: #2f855a;
+            margin-top: 8px;
+            font-weight: bold;
+            word-break: break-all;
+        }
+        .btn-container {
+            text-align: right;
+            margin-bottom: 30px;
+        }
+        button {
+            background-color: #2f855a;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1.05em;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: background 0.2s ease;
+        }
+        button:hover {
+            background-color: #22543d;
+        }
+        .panel {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 25px;
+            display: none;
+        }
+        .terminal-box {
+            background-color: #1a202c;
+            color: #cbd5e0;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 25px;
+            max-height: 250px;
+            overflow-y: auto;
+            border-left: 4px solid #4a5568;
+            white-space: pre-wrap;
+            font-size: 0.9em;
+            line-height: 1.4;
+        }
+        .terminal-box.error-state {
+            border-left-color: #e53e3e;
+            background-color: #2d1212;
+            color: #fed7d7;
+        }
+        .metric-container {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 25px;
+        }
+        .metric-card {
+            background: #ebf8ff;
+            border-left: 4px solid #3182ce;
+            padding: 15px;
+            border-radius: 4px;
+            flex: 1;
+            margin-right: 15px;
+            text-align: center;
+        }
+        .metric-card:last-child { margin-right: 0; }
+        .metric-title { font-size: 0.85em; color: #4a5568; text-transform: uppercase; font-weight: bold; }
+        .metric-value { font-size: 1.6em; font-weight: bold; color: #2b6cb0; margin-top: 5px; }
+        .status-box {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .success { background-color: #c6f6d5; color: #22543d; border: 1px solid #9ae6b4; }
+        .warning { background-color: #feebc8; color: #744210; border: 1px solid #fbd38d; }
+        .error { background-color: #fed7d7; color: #742a2a; border: 1px solid #feb2b2; }
+        .download-links {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .download-btn {
+            background-color: #3182ce;
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            font-weight: bold;
+            display: inline-block;
+            width: fit-content;
+            text-align: center;
+            transition: background 0.2s ease;
+        }
+        .download-btn:hover { background-color: #2b6cb0; }
+    </style>
 </head>
-
 <body>
+
 <div class="container">
     <h1>📊 Supplier Invoice Automation Dashboard</h1>
-    <p class="subtitle">
-        Upload the four Excel workbooks. The pipeline extracts the TNS data,
-        aggregates purchase orders and company totals, then prepares three
-        downloadable workbooks.
-    </p>
+    <p class="subtitle">Upload your four tracking spreadsheets to process them locally in your browser. An internet connection is required to load the Excel library.</p>
 
+    <!-- File Upload Grid Area -->
     <div class="grid">
         <div class="upload-box">
-            <label for="mainFile">1. Main Chinese Supplier File (TNS)</label>
-            <input type="file" id="mainFile" accept=".xlsx,.xls">
+            <label>📥 1. Main Chinese Supplier File (TNS)</label>
+            <span>Click to select an Excel file</span>
+            <input type="file" id="mainFile" accept=".xlsx, .xls">
             <div id="mainFileName" class="file-name"></div>
         </div>
-
         <div class="upload-box">
-            <label for="importsFile">2. Navision Journal (00. Imports)</label>
-            <input type="file" id="importsFile" accept=".xlsx,.xls">
+            <label>📥 2. Navision Journal Template (00. Imports)</label>
+            <span>Click to select an Excel file</span>
+            <input type="file" id="importsFile" accept=".xlsx, .xls">
             <div id="importsFileName" class="file-name"></div>
         </div>
-
         <div class="upload-box">
-            <label for="masterFile">3. Heze Masterspreadsheet</label>
-            <input type="file" id="masterFile" accept=".xlsx,.xls">
+            <label>📥 3. Heze Masterspreadsheet Track File</label>
+            <span>Click to select an Excel file</span>
+            <input type="file" id="masterFile" accept=".xlsx, .xls">
             <div id="masterFileName" class="file-name"></div>
         </div>
-
         <div class="upload-box">
-            <label for="summaryFile">4. Summary Outstanding</label>
-            <input type="file" id="summaryFile" accept=".xlsx,.xls">
+            <label>📥 4. Summary Outstanding Master File</label>
+            <span>Click to select an Excel file</span>
+            <input type="file" id="summaryFile" accept=".xlsx, .xls">
             <div id="summaryFileName" class="file-name"></div>
         </div>
     </div>
 
     <div class="btn-container">
-        <button id="processBtn">
-            Execute Processing Pipeline &amp; Run Audit Verification
-        </button>
+        <button id="processBtn">⚡ Execute Processing Pipeline & Run Audit Verification</button>
     </div>
 
-    <div class="panel">
-        <h3>🖥️ Execution Activity &amp; Diagnostic Console</h3>
-        <div id="terminalLog" class="terminal-box">
-            Waiting for the four Excel files.
-        </div>
+    <!-- Live Status Console Panel -->
+    <div id="consolePanel" class="panel" style="display: block; background: #fafafa; border-color: #cbd5e0; margin-bottom: 25px;">
+        <h3 style="margin-top: 0; color: #2d3748;">🖥️ Execution Activity & Diagnostic Console</h3>
+        <div id="terminalLog" class="terminal-box">System Status: Waiting for user file configuration tracking links...</div>
     </div>
 
-    <div id="resultPanel" class="panel" style="display:none">
+    <!-- Results Display Panel -->
+    <div id="resultPanel" class="panel">
         <div id="statusAlert" class="status-box"></div>
 
         <div class="metric-container">
@@ -230,712 +227,380 @@ button:disabled { opacity: .6; cursor: wait; }
                 <div id="m_gbp" class="metric-value">£0.00</div>
             </div>
             <div class="metric-card">
-                <div class="metric-title">Surface Area (M²)</div>
-                <div id="m_m2" class="metric-value">0.000</div>
+                <div class="metric-title">Surface Area Volume (M2)</div>
+                <div id="m_m2" class="metric-value">0.00 m²</div>
             </div>
         </div>
 
-        <div id="companyResults"></div>
+        <h3>Pivot 1 — Order Totals</h3>
+        <p>Each order is counted once. USD uses TNS TotalAmount (order total); GBP is USD ÷ 1.3; M² is summed from detail lines.</p>
+        <div style="overflow-x:auto; margin-bottom:20px;"><table id="orderPivotTable" style="width:100%; border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:8px;border-bottom:1px solid #cbd5e0;">Order Number</th><th style="text-align:left;padding:8px;border-bottom:1px solid #cbd5e0;">Company</th><th style="text-align:right;padding:8px;border-bottom:1px solid #cbd5e0;">Sum of USD</th><th style="text-align:right;padding:8px;border-bottom:1px solid #cbd5e0;">Sum of GBP</th><th style="text-align:right;padding:8px;border-bottom:1px solid #cbd5e0;">Sum of M2</th></tr></thead><tbody id="orderPivotBody"></tbody></table></div>
+        <h3>Pivot 2 — Company Aggregation</h3>
+        <div style="overflow-x:auto; margin-bottom:20px;"><table id="companyPivotTable" style="width:100%; border-collapse:collapse;"><thead><tr><th style="text-align:left;padding:8px;border-bottom:1px solid #cbd5e0;">Company</th><th style="text-align:right;padding:8px;border-bottom:1px solid #cbd5e0;">Sum of USD</th><th style="text-align:right;padding:8px;border-bottom:1px solid #cbd5e0;">Sum of GBP</th><th style="text-align:right;padding:8px;border-bottom:1px solid #cbd5e0;">Sum of M2</th></tr></thead><tbody id="companyPivotBody"></tbody></table></div>
 
-        <div id="missingEntriesBox" style="display:none">
-            <h3>Orders not previously found in Heze master</h3>
-            <pre id="missingEntriesList"></pre>
+        <div id="missingEntriesBox" style="display:none; margin-bottom: 25px;">
+            <div class="status-box warning" style="margin-bottom:5px;">⚠️ Tracking Alert: New PO lines missing from Master Ledger database records:</div>
+            <pre id="missingEntriesList" style="background: #fffaf0; padding: 10px; border: 1px solid #feebc8; border-radius: 4px; overflow-x: auto; font-family: monospace;"></pre>
         </div>
 
-        <h3>Download updated workbooks</h3>
+        <h3>💾 Export Balanced Excel Track Logs</h3>
+        <p>Your processes completed without errors. Click the buttons below to save your updated files back onto your machine:</p>
         <div class="download-links">
-            <a href="#" id="dl_imports" class="download-btn">
-                Download Updated Navision Journal
-            </a>
-            <a href="#" id="dl_master" class="download-btn">
-                Download Updated Heze Master
-            </a>
-            <a href="#" id="dl_summary" class="download-btn">
-                Download Updated Summary Outstanding
-            </a>
+            <a href="#" id="dl_imports" class="download-btn">📥 Download Updated Navision Journal (00. Imports)</a>
+            <a href="#" id="dl_master" class="download-btn">📥 Download Updated Heze Master Ledger</a>
+            <a href="#" id="dl_summary" class="download-btn">📥 Download Updated Summary Outstanding</a>
+            <a href="#" id="dl_audit" class="download-btn">📥 Download Pivots & Reconciliation Audit</a>
         </div>
     </div>
 </div>
 
 <script>
 (() => {
-'use strict';
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const terminal = $('terminalLog');
+  const initialMessage = 'System Status: Waiting for user file configuration tracking links...';
 
-const $ = id => document.getElementById(id);
-const terminal = $('terminalLog');
-const initialMessage = 'Waiting for the four Excel files.';
-
-function log(message, isError = false) {
-    if (terminal.innerText === initialMessage) {
-        terminal.innerText = '';
-    }
-    terminal.innerText +=
-        `[${new Date().toLocaleTimeString()}] ${message}\n`;
-
-    if (isError) {
-        terminal.classList.add('error-state');
-    }
+  function log(message, isError = false) {
+    if (terminal.innerText === initialMessage) terminal.innerText = '';
+    terminal.innerText += `[${new Date().toLocaleTimeString()}] ${message}\n`;
+    if (isError) terminal.classList.add('error-state');
     terminal.scrollTop = terminal.scrollHeight;
-}
-
-function clearLog() {
+  }
+  function clearLog() {
     terminal.innerText = '';
     terminal.classList.remove('error-state');
-}
-
-function sanitizeValue(value) {
+  }
+  function escapeHtml(value) { return String(value ?? '').replace(/[&<>\"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',"'":'&#39;'}[ch])); }
+  function sanitizeValue(value) {
     return typeof value === 'string'
-        ? value.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').trim()
-        : value;
-}
-
-/*
- * NORMALISE HEADERS
- * Handles Chinese-English headings, line breaks and _x000D_.
- */
-function normalizeHeader(value) {
+      ? value.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F]/g, '').trim()
+      : value;
+  }
+  function normalizeHeader(value) {
     return String(value ?? '')
-        .replace(/_x000D_/gi, ' ')
-        .replace(/[\r\n\t]/g, ' ')
-        .replace(/\s+/g, ' ')
-        .trim()
-        .toLowerCase()
-        .replace(/[^a-z0-9\u3400-\u9fff]/g, '');
-}
-
-/*
- * Convert Excel values to numbers.
- * Blank cells return null rather than zero, so we can distinguish
- * a blank separator row from a genuine transaction with zero values.
- */
-function toNumber(value) {
-    if (typeof value === 'number' && Number.isFinite(value)) {
-        return value;
-    }
-    if (value === null || value === undefined || value === '') {
-        return null;
-    }
-
+      .replace(/_x000D_/gi, ' ')
+      .replace(/[\r\n\t]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9\u3400-\u9fff]/g, '');
+  }
+  function toNumber(value) {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    if (value === null || value === undefined || value === '') return null;
     if (typeof value === 'string') {
-        let cleaned = value.trim();
-        if (!cleaned) return null;
-
-        cleaned = cleaned
-            .replace(/[,$£€\s]/g, '')
-            .replace(/\((.*)\)/, '-$1');
-
-        const n = Number(cleaned);
-        return Number.isFinite(n) ? n : null;
+      const cleaned = value.replace(/[,$£€\s]/g, '').replace(/\((.*)\)/, '-$1');
+      if (!cleaned) return null;
+      const n = Number(cleaned);
+      return Number.isFinite(n) ? n : null;
     }
     return null;
-}
-
-function companyFor(orderNo) {
+  }
+  function companyFor(orderNo) {
     const value = String(orderNo).trim().toUpperCase();
-
     if (value.startsWith('7')) return 'Decora';
     if (value.startsWith('CG')) return 'C&C';
     if (value.startsWith('RSF')) return 'SF';
-
     return 'Other';
-}
-
-function roundMoney(value) {
-    return Math.round((value + Number.EPSILON) * 100) / 100;
-}
-
-function round3(value) {
-    return Math.round((value + Number.EPSILON) * 1000) / 1000;
-}
-
-/*
- * READ WORKBOOK
- */
-function readWorkbook(file) {
+  }
+  function readWorkbook(file) {
     return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-
-        reader.onload = event => {
-            try {
-                const workbook = XLSX.read(
-                    new Uint8Array(event.target.result),
-                    {
-                        type: 'array',
-                        cellFormula: true,
-                        cellNF: true,
-                        cellText: true
-                    }
-                );
-                resolve(workbook);
-            } catch (error) {
-                reject(new Error(
-                    `Could not parse ${file.name}: ${error.message}`
-                ));
-            }
-        };
-
-        reader.onerror = () => reject(
-            new Error(`Browser could not read ${file.name}.`)
-        );
-
-        reader.readAsArrayBuffer(file);
+      const reader = new FileReader();
+      reader.onload = event => {
+        try {
+          resolve(XLSX.read(new Uint8Array(event.target.result), {
+            type: 'array', cellFormula: true, cellNF: true, cellText: true
+          }));
+        } catch (error) { reject(new Error(`Could not parse ${file.name}: ${error.message}`)); }
+      };
+      reader.onerror = () => reject(new Error(`Browser could not read ${file.name}.`));
+      reader.readAsArrayBuffer(file);
     });
-}
-
-function setFileLabel(inputId, labelId, description) {
+  }
+  function setFileLabel(inputId, labelId, description) {
     $(inputId).addEventListener('change', event => {
-        const file = event.target.files[0];
-
-        $(labelId).innerText = file
-            ? `Selected: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`
-            : '';
-
-        if (file) log(`${description}: ${file.name}`);
+      const file = event.target.files[0];
+      $(labelId).innerText = file
+        ? `📄 Staged: ${file.name} (${(file.size / 1024).toFixed(1)} KB)` : '';
+      if (file) log(`${description}: ${file.name}`);
     });
-}
+  }
+  setFileLabel('mainFile', 'mainFileName', 'Main supplier file selected');
+  setFileLabel('importsFile', 'importsFileName', 'Navision template selected');
+  setFileLabel('masterFile', 'masterFileName', 'Heze master selected');
+  setFileLabel('summaryFile', 'summaryFileName', 'Summary outstanding selected');
 
-setFileLabel('mainFile', 'mainFileName', 'TNS selected');
-setFileLabel('importsFile', 'importsFileName', 'Navision template selected');
-setFileLabel('masterFile', 'masterFileName', 'Heze master selected');
-setFileLabel('summaryFile', 'summaryFileName', 'Summary outstanding selected');
-
-/*
- * FIND THE TNS HEADER ROW
- */
-function detectHeaderRow(matrix) {
+  function detectHeaderRow(matrix) {
     for (let r = 0; r < Math.min(matrix.length, 15); r++) {
-        const headers = (matrix[r] || []).map(normalizeHeader);
-
-        const hasOrder = headers.some(h =>
-            h === 'orderno' ||
-            h === 'ordernumber' ||
-            (h.includes('order') && h.includes('no') && !h.includes('total'))
-        );
-
-        const hasM2 = headers.some(h =>
-            h === 'm2' || (h.includes('平方') && h.includes('m2'))
-        );
-
-        const hasAmount = headers.some(h =>
-            h === 'amount' || h === '金额amount'
-        );
-
-        if (hasOrder && hasM2 && hasAmount) return r;
+      const headers = (matrix[r] || []).map(normalizeHeader);
+      const hasOrder = headers.some(h => h === 'orderno' || h === 'ordernumber' || h.includes('order') && h.includes('no'));
+      const hasM2 = headers.some(h => h === 'm2' || h.includes('平方') && h.includes('m2'));
+      const hasAmount = headers.some(h => h === 'totalamount' || h === '总金额totalamount' || h === 'amount' || h === '金额amount');
+      if (hasOrder && hasM2 && hasAmount) return r;
     }
-
-    throw new Error(
-        'Could not identify the TNS header row. Expected Order NO, ' +
-        '平方 M2 and 金额 Amount columns.'
-    );
-}
-
-/*
- * FIND REQUIRED TNS COLUMNS
- */
-function findColumns(headerRow) {
+    throw new Error('Could not identify the TNS header row. Expected Order NO, 平方 M2 and 金额 Amount columns.');
+  }
+  function findColumns(headerRow) {
     const headers = headerRow.map(normalizeHeader);
     const find = predicate => headers.findIndex(predicate);
-
-    const order = find(h =>
-        ['orderno', 'ordernumber'].includes(h) ||
-        (h.includes('order') && h.includes('no') && !h.includes('total'))
-    );
-
-    const m2 = find(h =>
-        h === 'm2' || (h.includes('平方') && h.includes('m2'))
-    );
-
-    // Prefer line Amount; never use TotalAmount as the line amount.
-    let amount = find(h =>
-        h === 'amount' || h === '金额amount'
-    );
-
-    if (amount < 0) {
-        amount = find(h =>
-            h.includes('amount') &&
-            !h.includes('totalamount') &&
-            !h.includes('total')
-        );
-    }
-
-    const item = find(h =>
-        h === 'item' || h.includes('itemno') || h.includes('description')
-    );
-
+    const order = find(h => ['orderno', 'ordernumber'].includes(h) || (h.includes('order') && h.includes('no') && !h.includes('total')));
+    const m2 = find(h => h === 'm2' || (h.includes('平方') && h.includes('m2')));
+    // Use the order-level TotalAmount as the USD source. Fall back to line Amount only
+    // when the TNS file genuinely has no TotalAmount column.
+    let amount = find(h => h === 'totalamount' || h === '总金额totalamount' || (h.includes('total') && h.includes('amount')));
+    const amountType = amount >= 0 ? 'TotalAmount' : 'Amount';
+    if (amount < 0) amount = find(h => h === 'amount' || h === '金额amount' || (h.includes('amount') && !h.includes('total')));
+    const item = find(h => h === 'item' || h === 'itemno' || h === 'description');
     if (order < 0 || m2 < 0 || amount < 0) {
-        throw new Error(
-            'Required TNS columns were not found. Headers detected: ' +
-            headerRow.map(v => String(v ?? '')).join(' | ')
-        );
+      throw new Error(`Required TNS columns not found. Detected headers: ${headerRow.map(v => String(v ?? '')).join(' | ')}`);
     }
-
-    return { order, m2, amount, item };
-}
-
-/*
- * EXTRACT AND VALIDATE TRANSACTIONS
- *
- * A blank Order No inherits the latest order number.
- * Rows with neither numeric Amount nor numeric M² are ignored.
- * Amount and M² are taken from line-level columns, not TotalAmount.
- */
-function extractTransactions(workbook, sheetName) {
+    return { order, m2, amount, item, amountType };
+  }
+  function extractTransactions(workbook, sheetName) {
     const sheet = workbook.Sheets[sheetName];
-
-    const matrix = XLSX.utils.sheet_to_json(sheet, {
-        header: 1,
-        defval: null,
-        raw: true
-    });
-
+    const matrix = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null, raw: true });
     const headerIndex = detectHeaderRow(matrix);
     const columns = findColumns(matrix[headerIndex] || []);
-
-    log(`TNS header row detected: Excel row ${headerIndex + 1}.`);
-    log(
-        `Columns: Order=${columns.order + 1}, ` +
-        `M²=${columns.m2 + 1}, Amount=${columns.amount + 1}.`
-    );
+    log(`TNS headers detected on Excel row ${headerIndex + 1}.`);
+    log(`Using columns: Order=${columns.order + 1}, M²=${columns.m2 + 1}, ${columns.amountType}=${columns.amount + 1}.`);
 
     let currentOrder = '';
     const transactions = [];
     let skipped = 0;
-
     for (let r = headerIndex + 1; r < matrix.length; r++) {
-        const row = matrix[r] || [];
-        const rawOrder = row[columns.order];
-
-        if (
-            rawOrder !== null &&
-            rawOrder !== undefined &&
-            String(rawOrder).trim() !== ''
-        ) {
-            currentOrder = String(rawOrder).trim();
-        }
-
-        const m2 = toNumber(row[columns.m2]);
-        const amount = toNumber(row[columns.amount]);
-
-        const itemValue = columns.item >= 0
-            ? String(row[columns.item] ?? '').trim()
-            : '';
-
-        const hasTransactionValue = m2 !== null || amount !== null;
-
-        if (!hasTransactionValue) {
-            skipped++;
-            continue;
-        }
-
-        if (!currentOrder) {
-            throw new Error(
-                `Transaction-like data on row ${r + 1} has no order number.`
-            );
-        }
-
-        transactions.push({
-            Order_No: currentOrder,
-            M2: m2 ?? 0,
-            Amount: amount ?? 0,
-            Item: itemValue,
-            SourceRow: r + 1,
-            Company: companyFor(currentOrder)
-        });
+      const row = matrix[r] || [];
+      const rawOrder = row[columns.order];
+      if (rawOrder !== null && rawOrder !== undefined && String(rawOrder).trim() !== '') {
+        currentOrder = String(rawOrder).trim();
+      }
+      const m2 = toNumber(row[columns.m2]);
+      const amount = toNumber(row[columns.amount]);
+      const itemValue = columns.item >= 0 ? String(row[columns.item] ?? '').trim() : '';
+      // Do not carry data from blank separator rows; a row is a transaction only if
+      // it has a numeric line amount or M². Order number is inherited from above.
+      const hasTransactionValue = m2 !== null || amount !== null;
+      if (!hasTransactionValue) { skipped++; continue; }
+      if (!currentOrder) {
+        throw new Error(`Transaction-like row ${r + 1} has M²/Amount data but no current Order No. Check the TNS layout.`);
+      }
+      transactions.push({
+        Order_No: currentOrder,
+        M2: m2 ?? 0,
+        Amount: amount ?? 0,
+        AmountType: columns.amountType,
+        Item: itemValue,
+        SourceRow: r + 1,
+        Company: companyFor(currentOrder)
+      });
     }
-
-    if (!transactions.length) {
-        throw new Error('No valid TNS transaction rows were found.');
-    }
-
-    log(
-        `Extracted ${transactions.length} transaction lines; ` +
-        `ignored ${skipped} blank/non-amount rows.`
-    );
-
+    if (!transactions.length) throw new Error('No transaction rows found in TNS after header normalisation.');
+    log(`Extracted ${transactions.length} transaction lines; ignored ${skipped} blank/non-amount rows.`);
     return transactions;
-}
-
-/*
- * PIVOT 1: AGGREGATE BY PURCHASE ORDER
- *
- * Sum line Amount and M² for each order.
- * Calculate GBP using the agreed rate of 1.3.
- *
- * PIVOT 2: AGGREGATE THE ORDER TOTALS BY COMPANY.
- */
-function aggregate(transactions) {
+  }
+  function aggregate(transactions) {
     const orderMap = new Map();
-
     for (const line of transactions) {
-        if (!orderMap.has(line.Order_No)) {
-            orderMap.set(line.Order_No, {
-                Order_No: line.Order_No,
-                Company: line.Company,
-                Sum_of_USD: 0,
-                Sum_of_GBP: 0,
-                Sum_of_M2: 0,
-                Line_Count: 0
-            });
-        }
-
-        const order = orderMap.get(line.Order_No);
-
-        order.Sum_of_USD += line.Amount;
-        order.Sum_of_M2 += line.M2;
-        order.Line_Count++;
+      if (!orderMap.has(line.Order_No)) {
+        orderMap.set(line.Order_No, {
+          Order_No: line.Order_No, Company: line.Company,
+          Sum_of_USD: 0, Sum_of_GBP: 0, Sum_of_M2: 0, Line_Count: 0,
+          TotalAmountValues: [], LineAmountSum: 0
+        });
+      }
+      const order = orderMap.get(line.Order_No);
+      order.Sum_of_M2 += line.M2;
+      order.Line_Count++;
+      if (line.AmountType === 'TotalAmount') {
+        if (line.Amount !== null && Number.isFinite(line.Amount)) order.TotalAmountValues.push(line.Amount);
+      } else {
+        order.LineAmountSum += line.Amount;
+      }
     }
-
     const orders = Array.from(orderMap.values());
-
-    const companyMap = new Map();
-
     for (const order of orders) {
-        // Keep full precision internally; round when exporting.
-        order.Sum_of_GBP = order.Sum_of_USD / 1.3;
-
-        if (!companyMap.has(order.Company)) {
-            companyMap.set(order.Company, {
-                Company: order.Company,
-                Sum_of_USD: 0,
-                Sum_of_GBP: 0,
-                Sum_of_M2: 0,
-                Order_Count: 0
-            });
+      if (order.TotalAmountValues.length) {
+        // TotalAmount is an order total and may be repeated on every detail row.
+        // Use it once per order; do not add repeated copies together.
+        const uniqueTotals = [...new Set(order.TotalAmountValues.map(v => Math.round(v * 100) / 100))];
+        if (uniqueTotals.length > 1) {
+          throw new Error(`Order ${order.Order_No} has conflicting TotalAmount values (${uniqueTotals.join(', ')}). Please check the TNS source before posting.`);
         }
-
-        const company = companyMap.get(order.Company);
-
-        company.Sum_of_USD += order.Sum_of_USD;
-        company.Sum_of_GBP += order.Sum_of_GBP;
-        company.Sum_of_M2 += order.Sum_of_M2;
-        company.Order_Count++;
+        order.Sum_of_USD = uniqueTotals[0];
+      } else {
+        order.Sum_of_USD = order.LineAmountSum;
+      }
+      order.Sum_of_GBP = order.Sum_of_USD / 1.3;
+      delete order.TotalAmountValues; delete order.LineAmountSum;
     }
-
+    const companyMap = new Map();
+    for (const order of orders) {
+      if (!companyMap.has(order.Company)) companyMap.set(order.Company, { Company: order.Company, Sum_of_USD: 0, Sum_of_GBP: 0, Sum_of_M2: 0, Order_Count: 0 });
+      const company = companyMap.get(order.Company);
+      company.Sum_of_USD += order.Sum_of_USD;
+      company.Sum_of_GBP += order.Sum_of_GBP;
+      company.Sum_of_M2 += order.Sum_of_M2;
+      company.Order_Count++;
+    }
     const companies = Array.from(companyMap.values());
-
-    const totals = orders.reduce((result, order) => {
-        result.usd += order.Sum_of_USD;
-        result.gbp += order.Sum_of_GBP;
-        result.m2 += order.Sum_of_M2;
-        return result;
+    const totals = orders.reduce((a, order) => {
+      a.usd += order.Sum_of_USD; a.gbp += order.Sum_of_GBP; a.m2 += order.Sum_of_M2;
+      return a;
     }, { usd: 0, gbp: 0, m2: 0 });
-
-    const decoraUSD = companyMap.get('Decora')?.Sum_of_USD ?? 0;
-
-    return { orders, companies, totals, decoraUSD };
-}
-
-function firstSheet(workbook, description) {
-    if (!workbook.SheetNames || !workbook.SheetNames.length) {
-        throw new Error(`${description} workbook has no worksheets.`);
-    }
+    const decora = companyMap.get('Decora')?.Sum_of_USD ?? 0;
+    return { orders, companies, totals, decora };
+  }
+  function firstSheet(workbook, description) {
+    if (!workbook.SheetNames || workbook.SheetNames.length === 0) throw new Error(`${description} workbook has no worksheets.`);
     return workbook.SheetNames[0];
-}
-
-function sheetRows(workbook, sheetName) {
-    return XLSX.utils.sheet_to_json(
-        workbook.Sheets[sheetName],
-        { defval: '', raw: true }
-    );
-}
-
-function buildWorkbook(rows, sheetName) {
-    const workbook = XLSX.utils.book_new();
-
-    XLSX.utils.book_append_sheet(
-        workbook,
-        XLSX.utils.json_to_sheet(rows),
-        sheetName || 'Sheet1'
-    );
-
-    return workbook;
-}
-
-function downloadLink(id, workbook, filename) {
+  }
+  function sheetRows(workbook, sheetName) {
+    return XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: '', raw: true });
+  }
+  function buildWorkbook(rows, sheetName) {
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), sheetName || 'Sheet1');
+    return wb;
+  }
+  function downloadLink(id, workbook, filename) {
     $(id).onclick = event => {
-        event.preventDefault();
-
-        try {
-            const bytes = XLSX.write(workbook, {
-                bookType: 'xlsx',
-                type: 'array'
-            });
-
-            const blob = new Blob([bytes], {
-                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-            });
-
-            const url = URL.createObjectURL(blob);
-            const anchor = document.createElement('a');
-
-            anchor.href = url;
-            anchor.download = filename;
-            anchor.click();
-
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-            log(`Download started: ${filename}`);
-        } catch (error) {
-            log(`Download failed for ${filename}: ${error.message}`, true);
-        }
+      event.preventDefault();
+      try {
+        const bytes = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const blob = new Blob([bytes], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const url = URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url; anchor.download = filename; anchor.click();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+        log(`Download started: ${filename}`);
+      } catch (error) { log(`Download failed for ${filename}: ${error.message}`, true); }
     };
-}
+  }
 
-/*
- * MAIN ETL PIPELINE
- */
-$('processBtn').addEventListener('click', async () => {
+  $('processBtn').addEventListener('click', async () => {
     const files = {
-        main: $('mainFile').files[0],
-        imports: $('importsFile').files[0],
-        master: $('masterFile').files[0],
-        summary: $('summaryFile').files[0]
+      main: $('mainFile').files[0], imports: $('importsFile').files[0],
+      master: $('masterFile').files[0], summary: $('summaryFile').files[0]
     };
-
-    if (typeof XLSX === 'undefined') {
-        log(
-            'Excel library XLSX failed to load. Check internet/CDN access.',
-            true
-        );
-        alert('Excel library failed to load. Check your connection and reload.');
-        return;
-    }
-
+    if (typeof XLSX === 'undefined') { log('Excel library (XLSX) failed to load. Check internet/CDN access and reload.', true); alert('Excel library failed to load. Check your internet connection and reload.'); return; }
     for (const [key, file] of Object.entries(files)) {
-        if (!file) {
-            log(`Missing required upload: ${key}.`, true);
-            alert('Please upload all four Excel files before processing.');
-            return;
-        }
+      if (!file) { log(`Missing required upload: ${key}.`, true); alert('Please upload all four Excel files before processing.'); return; }
     }
-
-    const button = $('processBtn');
-    button.disabled = true;
-    $('resultPanel').style.display = 'none';
-    clearLog();
-
+    clearLog(); $('resultPanel').style.display = 'none';
     try {
-        log('Starting ETL pipeline: Extract, Transform, Load.');
+      log('Starting ETL pipeline: Extract, Transform, Load.');
+      const [mainWb, importsWb, masterWb, summaryWb] = await Promise.all([
+        readWorkbook(files.main), readWorkbook(files.imports), readWorkbook(files.master), readWorkbook(files.summary)
+      ]);
+      const invoiceName = firstSheet(mainWb, 'TNS');
+      const importsSheet = firstSheet(importsWb, 'Navision');
+      const masterSheet = firstSheet(masterWb, 'Heze master');
+      const summarySheet = firstSheet(summaryWb, 'Summary outstanding');
+      log(`TNS worksheet/invoice identifier: ${invoiceName}.`);
 
-        const [mainWb, importsWb, masterWb, summaryWb] =
-            await Promise.all([
-                readWorkbook(files.main),
-                readWorkbook(files.imports),
-                readWorkbook(files.master),
-                readWorkbook(files.summary)
-            ]);
+      const transactions = extractTransactions(mainWb, invoiceName);
+      const { orders, companies, totals, decora } = aggregate(transactions);
+      log(`Pivot 1 complete: ${orders.length} unique orders aggregated from ${transactions.length} lines.`);
+      log(`Pivot 2 complete: ${companies.length} company groups calculated.`);
+      companies.forEach(c => log(`Company ${c.Company}: USD ${c.Sum_of_USD.toFixed(2)}, GBP ${(c.Sum_of_GBP).toFixed(2)}, M² ${c.Sum_of_M2.toFixed(3)} (${c.Order_Count} orders).`));
+      log(`Grand totals: USD ${totals.usd.toFixed(2)}; GBP ${totals.gbp.toFixed(2)}; M² ${totals.m2.toFixed(3)}.`);
 
-        const invoiceName = firstSheet(mainWb, 'TNS');
-        const importsSheet = firstSheet(importsWb, 'Navision');
-        const masterSheet = firstSheet(masterWb, 'Heze master');
-        const summarySheet = firstSheet(summaryWb, 'Summary outstanding');
+      // HEZE MASTER: replace existing rows for orders included in this run, preserve other rows.
+      const masterRows = sheetRows(masterWb, masterSheet);
+      const existingOrders = new Set(masterRows.map(r => String(r['Order Number'] ?? '').trim()).filter(Boolean));
+      const missingEntries = orders.map(o => o.Order_No).filter(no => !existingOrders.has(no));
+      const orderSet = new Set(orders.map(o => o.Order_No));
+      const cleanMaster = masterRows.filter(r => !orderSet.has(String(r['Order Number'] ?? '').trim()));
+      orders.forEach(o => cleanMaster.push({
+        'Order Number': sanitizeValue(o.Order_No),
+        'Sum of USD': roundMoney(o.Sum_of_USD),
+        'Sum of GBP': roundMoney(o.Sum_of_GBP),
+        'Sum of M2': round3(o.Sum_of_M2),
+        'Heze Invoice Number': sanitizeValue(invoiceName)
+      }));
+      const newMasterWb = buildWorkbook(cleanMaster, masterSheet);
+      log(`Heze master prepared: ${orders.length} order rows added/replaced; ${missingEntries.length} were not previously present.`);
 
-        log(`TNS worksheet/invoice identifier: ${invoiceName}.`);
+      // NAVISION IMPORTS: one journal row per aggregated purchase order.
+      const importRows = orders.map(o => ({
+        'Type': 'G/L Account',
+        'Purch. Order No.': sanitizeValue(o.Order_No),
+        'Description/Comment': sanitizeValue(invoiceName),
+        'Quantity': 1,
+        'Direct Unit Cost Excl. VAT': roundMoney(o.Sum_of_USD),
+        'Line Amount Excl. VAT': roundMoney(o.Sum_of_USD)
+      }));
+      const newImportsWb = buildWorkbook(importRows, importsSheet);
+      log(`Navision journal prepared: ${importRows.length} order-level rows.`);
 
-        // EXTRACT
-        const transactions = extractTransactions(mainWb, invoiceName);
+      // SUMMARY OUTSTANDING: append one invoice-level summary row.
+      const summaryRows = sheetRows(summaryWb, summarySheet);
+      summaryRows.push({
+        'Invoice': sanitizeValue(invoiceName),
+        'USD': roundMoney(totals.usd),
+        "Today's Rate 1.3": roundMoney(totals.gbp),
+        'Decora Element (USD)': roundMoney(decora)
+      });
+      const newSummaryWb = buildWorkbook(summaryRows, summarySheet);
+      log(`Summary outstanding prepared: appended invoice ${invoiceName}; Decora USD ${decora.toFixed(2)}.`);
 
-        // TRANSFORM: both pivots and overall totals
-        const { orders, companies, totals, decoraUSD } =
-            aggregate(transactions);
+      // Reconciliation uses the exact values loaded into each generated output, scoped to this invoice.
+      const navUsd = importRows.reduce((sum, r) => sum + (toNumber(r['Line Amount Excl. VAT']) || 0), 0);
+      const hezeRowsForInvoice = cleanMaster.filter(r => String(r['Heze Invoice Number'] ?? '').trim() === invoiceName);
+      const hezeUsd = hezeRowsForInvoice.reduce((sum, r) => sum + (toNumber(r['Sum of USD']) || 0), 0);
+      const hezeGbp = hezeRowsForInvoice.reduce((sum, r) => sum + (toNumber(r['Sum of GBP']) || 0), 0);
+      const hezeM2 = hezeRowsForInvoice.reduce((sum, r) => sum + (toNumber(r['Sum of M2']) || 0), 0);
+      const summaryInvoiceRows = summaryRows.filter(r => String(r['Invoice'] ?? '').trim() === invoiceName);
+      const summaryUsd = summaryInvoiceRows.length ? toNumber(summaryInvoiceRows[summaryInvoiceRows.length - 1]['USD']) : null;
+      const summaryGbp = summaryInvoiceRows.length ? toNumber(summaryInvoiceRows[summaryInvoiceRows.length - 1]["Today's Rate 1.3"]) : null;
+      const reconciliationRows = [
+        { Check: 'TNS source totals', USD: roundMoney(totals.usd), GBP: roundMoney(totals.gbp), M2: totals.m2, Status: 'SOURCE' },
+        { Check: 'Pivot 1 - by order (grand total)', USD: roundMoney(orders.reduce((s,o)=>s+o.Sum_of_USD,0)), GBP: roundMoney(orders.reduce((s,o)=>s+o.Sum_of_GBP,0)), M2: orders.reduce((s,o)=>s+o.Sum_of_M2,0), Status: 'CALCULATED' },
+        { Check: 'Pivot 2 - by company (grand total)', USD: roundMoney(companies.reduce((s,c)=>s+c.Sum_of_USD,0)), GBP: roundMoney(companies.reduce((s,c)=>s+c.Sum_of_GBP,0)), M2: companies.reduce((s,c)=>s+c.Sum_of_M2,0), Status: 'CALCULATED' },
+        { Check: 'Heze Master - invoice rows', USD: roundMoney(hezeUsd), GBP: roundMoney(hezeGbp), M2: hezeM2, Status: compareTotals(totals, {usd:hezeUsd,gbp:hezeGbp,m2:hezeM2}) ? 'PASS' : 'CHECK' },
+        { Check: 'Navision Journal - line amount total', USD: roundMoney(navUsd), GBP: '', M2: '', Status: Math.abs(navUsd-totals.usd)<0.011 ? 'PASS' : 'CHECK' },
+        { Check: 'Summary Outstanding - invoice row', USD: summaryUsd ?? '', GBP: summaryGbp ?? '', M2: '', Status: summaryUsd !== null && summaryGbp !== null && Math.abs(summaryUsd-totals.usd)<0.011 && Math.abs(summaryGbp-totals.gbp)<0.011 ? 'PASS' : 'CHECK' }
+      ];
+      const auditWb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(auditWb, XLSX.utils.json_to_sheet(orders.map(o => ({'Order Number':o.Order_No, Company:o.Company, 'Sum of USD':roundMoney(o.Sum_of_USD), 'Sum of GBP':roundMoney(o.Sum_of_GBP), 'Sum of M2':o.Sum_of_M2, 'Line Count':o.Line_Count}))), 'Pivot 1 - Orders');
+      XLSX.utils.book_append_sheet(auditWb, XLSX.utils.json_to_sheet([...companies.map(c=>({Company:c.Company,'Sum of USD':roundMoney(c.Sum_of_USD),'Sum of GBP':roundMoney(c.Sum_of_GBP),'Sum of M2':c.Sum_of_M2,'Order Count':c.Order_Count})), {Company:'Grand Total','Sum of USD':roundMoney(totals.usd),'Sum of GBP':roundMoney(totals.gbp),'Sum of M2':totals.m2}]), 'Pivot 2 - Company');
+      XLSX.utils.book_append_sheet(auditWb, XLSX.utils.json_to_sheet(reconciliationRows), 'Reconciliation');
+      log(`Reconciliation: Heze USD ${hezeUsd.toFixed(2)}, Navision USD ${navUsd.toFixed(2)}, Summary USD ${summaryUsd === null ? 'not found' : summaryUsd.toFixed(2)}.`);
 
-        log(
-            `Pivot 1 complete: ${orders.length} orders from ` +
-            `${transactions.length} transaction lines.`
-        );
-
-        log(`Pivot 2 complete: ${companies.length} company groups.`);
-
-        companies.forEach(company => {
-            log(
-                `${company.Company}: USD ${company.Sum_of_USD.toFixed(2)}, ` +
-                `GBP ${company.Sum_of_GBP.toFixed(2)}, ` +
-                `M² ${company.Sum_of_M2.toFixed(3)}.`
-            );
-        });
-
-        log(
-            `Grand totals: USD ${totals.usd.toFixed(2)}, ` +
-            `GBP ${totals.gbp.toFixed(2)}, M² ${totals.m2.toFixed(3)}.`
-        );
-
-        // LOAD 1: HEZE MASTER
-        const masterRows = sheetRows(masterWb, masterSheet);
-
-        const existingOrders = new Set(
-            masterRows
-                .map(row => String(row['Order Number'] ?? '').trim())
-                .filter(Boolean)
-        );
-
-        const missingEntries = orders
-            .map(order => order.Order_No)
-            .filter(orderNo => !existingOrders.has(orderNo));
-
-        // Replace existing entries for these orders, preserve other rows.
-        const orderSet = new Set(orders.map(order => order.Order_No));
-
-        const cleanMaster = masterRows.filter(row =>
-            !orderSet.has(String(row['Order Number'] ?? '').trim())
-        );
-
-        orders.forEach(order => {
-            cleanMaster.push({
-                'Order Number': sanitizeValue(order.Order_No),
-                'Sum of USD': roundMoney(order.Sum_of_USD),
-                'Sum of GBP': roundMoney(order.Sum_of_GBP),
-                'Sum of M2': round3(order.Sum_of_M2),
-                'Heze Invoice Number': sanitizeValue(invoiceName)
-            });
-        });
-
-        const newMasterWb = buildWorkbook(cleanMaster, masterSheet);
-
-        log(
-            `Heze master prepared. ${orders.length} order rows added/replaced; ` +
-            `${missingEntries.length} were not previously present.`
-        );
-
-        // LOAD 2: NAVISION IMPORTS
-        const importRows = orders.map(order => ({
-            'Type': 'G/L Account',
-            'Purch. Order No.': sanitizeValue(order.Order_No),
-            'Description/Comment': sanitizeValue(invoiceName),
-            'Quantity': 1,
-            'Direct Unit Cost Excl. VAT': roundMoney(order.Sum_of_USD),
-            'Line Amount Excl. VAT': roundMoney(order.Sum_of_USD)
-        }));
-
-        const newImportsWb = buildWorkbook(importRows, importsSheet);
-
-        log(`Navision journal prepared: ${importRows.length} order rows.`);
-
-        // LOAD 3: SUMMARY OUTSTANDING
-        const summaryRows = sheetRows(summaryWb, summarySheet);
-
-        summaryRows.push({
-            'Invoice': sanitizeValue(invoiceName),
-            'USD': roundMoney(totals.usd),
-            "Today's Rate 1.3": roundMoney(totals.gbp),
-            'Decora Element (USD)': roundMoney(decoraUSD)
-        });
-
-        const newSummaryWb = buildWorkbook(summaryRows, summarySheet);
-
-        log(
-            `Summary outstanding prepared for ${invoiceName}. ` +
-            `Decora USD: ${decoraUSD.toFixed(2)}.`
-        );
-
-        // DISPLAY TOTALS
-        $('m_usd').innerText = '$' + totals.usd.toLocaleString(
-            undefined,
-            { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-        );
-
-        $('m_gbp').innerText = '£' + totals.gbp.toLocaleString(
-            undefined,
-            { minimumFractionDigits: 2, maximumFractionDigits: 2 }
-        );
-
-        $('m_m2').innerText = totals.m2.toLocaleString(
-            undefined,
-            { minimumFractionDigits: 3, maximumFractionDigits: 3 }
-        ) + ' m²';
-
-        // DISPLAY COMPANY PIVOT
-        const companyTable = document.createElement('table');
-        companyTable.style.width = '100%';
-        companyTable.style.borderCollapse = 'collapse';
-
-        companyTable.innerHTML = `
-            <thead>
-                <tr>
-                    <th style="text-align:left;padding:8px">Company</th>
-                    <th style="text-align:right;padding:8px">Orders</th>
-                    <th style="text-align:right;padding:8px">USD</th>
-                    <th style="text-align:right;padding:8px">GBP</th>
-                    <th style="text-align:right;padding:8px">M²</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${companies.map(company => `
-                    <tr>
-                        <td style="padding:8px">${company.Company}</td>
-                        <td style="text-align:right;padding:8px">${company.Order_Count}</td>
-                        <td style="text-align:right;padding:8px">${roundMoney(company.Sum_of_USD).toFixed(2)}</td>
-                        <td style="text-align:right;padding:8px">${roundMoney(company.Sum_of_GBP).toFixed(2)}</td>
-                        <td style="text-align:right;padding:8px">${round3(company.Sum_of_M2).toFixed(3)}</td>
-                    </tr>
-                `).join('')}
-            </tbody>`;
-
-        $('companyResults').innerHTML = '<h3>Company-level aggregation</h3>';
-        $('companyResults').appendChild(companyTable);
-
-        // DISPLAY MASTER LEDGER AUDIT
-        const status = $('statusAlert');
-
-        if (missingEntries.length) {
-            status.className = 'status-box warning';
-            status.innerText =
-                `Processing completed with ${missingEntries.length} order(s) ` +
-                'not previously found in the Heze master. Review the list below.';
-
-            $('missingEntriesBox').style.display = 'block';
-            $('missingEntriesList').innerText =
-                JSON.stringify(missingEntries, null, 2);
-        } else {
-            status.className = 'status-box success';
-            status.innerText =
-                'Processing completed. All source orders were already present ' +
-                'in the Heze master. Review the totals before posting.';
-
-            $('missingEntriesBox').style.display = 'none';
-        }
-
-        // PREPARE DOWNLOADS
-        downloadLink(
-            'dl_imports',
-            newImportsWb,
-            '00_Imports_Updated.xlsx'
-        );
-
-        downloadLink(
-            'dl_master',
-            newMasterWb,
-            'Heze_Masterspreadsheet_Updated.xlsx'
-        );
-
-        downloadLink(
-            'dl_summary',
-            newSummaryWb,
-            'Summary_Outstanding_Updated.xlsx'
-        );
-
-        $('resultPanel').style.display = 'block';
-
-        log(
-            'Pipeline finished. Review all figures and workbook structures ' +
-            'before using them for accounting postings.'
-        );
-
-        $('resultPanel').scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-
+      $('m_usd').innerText = '$' + totals.usd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      $('m_gbp').innerText = '£' + totals.gbp.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      $('m_m2').innerText = totals.m2.toLocaleString(undefined, { minimumFractionDigits: 3, maximumFractionDigits: 7 }) + ' m²';
+      const money = n => Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      const cellStyle = 'padding:8px;border-bottom:1px solid #e2e8f0;';
+      $('orderPivotBody').innerHTML = orders.map(o => `<tr><td style="${cellStyle}">${escapeHtml(o.Order_No)}</td><td style="${cellStyle}">${escapeHtml(o.Company)}</td><td style="${cellStyle}text-align:right;">${money(o.Sum_of_USD)}</td><td style="${cellStyle}text-align:right;">${money(o.Sum_of_GBP)}</td><td style="${cellStyle}text-align:right;">${Number(o.Sum_of_M2).toFixed(7)}</td></tr>`).join('') + `<tr style="font-weight:bold;background:#edf2f7;"><td style="${cellStyle}" colspan="2">Grand Total</td><td style="${cellStyle}text-align:right;">${money(totals.usd)}</td><td style="${cellStyle}text-align:right;">${money(totals.gbp)}</td><td style="${cellStyle}text-align:right;">${totals.m2.toFixed(7)}</td></tr>`;
+      $('companyPivotBody').innerHTML = companies.map(c => `<tr><td style="${cellStyle}">${escapeHtml(c.Company)}</td><td style="${cellStyle}text-align:right;">${money(c.Sum_of_USD)}</td><td style="${cellStyle}text-align:right;">${money(c.Sum_of_GBP)}</td><td style="${cellStyle}text-align:right;">${c.Sum_of_M2.toFixed(7)}</td></tr>`).join('') + `<tr style="font-weight:bold;background:#edf2f7;"><td style="${cellStyle}">Grand Total</td><td style="${cellStyle}text-align:right;">${money(totals.usd)}</td><td style="${cellStyle}text-align:right;">${money(totals.gbp)}</td><td style="${cellStyle}text-align:right;">${totals.m2.toFixed(7)}</td></tr>`;
+      const status = $('statusAlert');
+      if (missingEntries.length) {
+        status.className = 'status-box warning';
+        status.innerText = `Processing completed with ${missingEntries.length} order(s) not previously found in the Heze master. Review the list below.`;
+        $('missingEntriesBox').style.display = 'block';
+        $('missingEntriesList').innerText = JSON.stringify(missingEntries, null, 2);
+      } else {
+        status.className = 'status-box success';
+        status.innerText = 'Processing completed. All source orders were already present in the Heze master. Review totals before posting.';
+        $('missingEntriesBox').style.display = 'none';
+      }
+      downloadLink('dl_imports', newImportsWb, '00_Imports_Updated.xlsx');
+      downloadLink('dl_master', newMasterWb, 'Heze_Masterspreadsheet_Updated.xlsx');
+      downloadLink('dl_summary', newSummaryWb, 'Summary_Outstanding_Updated.xlsx');
+      downloadLink('dl_audit', auditWb, 'TNS_Pivots_Reconciliation_Audit.xlsx');
+      $('resultPanel').style.display = 'block';
+      log('Pipeline finished. Output workbooks are ready. Please review the figures before posting to accounting.');
+      $('resultPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
     } catch (error) {
-        log(`PROCESSING FAILED: ${error.message || String(error)}`, true);
-        console.error(error);
-
-        alert(
-            `Processing failed: ${error.message || String(error)}\n\n` +
-            'See the diagnostic console for details.'
-        );
-    } finally {
-        button.disabled = false;
+      log(`PROCESSING FAILED: ${error.message || String(error)}`, true);
+      console.error(error);
+      alert(`Processing failed: ${error.message || String(error)}\n\nSee the diagnostic console for details.`);
     }
-});
+  });
+  function compareTotals(source, target) { return Math.abs(source.usd-target.usd)<0.011 && Math.abs(source.gbp-target.gbp)<0.011 && Math.abs(source.m2-target.m2)<0.0005; }
+  function roundMoney(value) { return Math.round((value + Number.EPSILON) * 100) / 100; }
+  function round3(value) { return Math.round((value + Number.EPSILON) * 1000) / 1000; }
 })();
 </script>
 </body>
