@@ -420,14 +420,19 @@
     const orders = Array.from(orderMap.values());
     for (const order of orders) {
       if (order.TotalAmountValues.length) {
-        // TotalAmount is an order total and may be repeated on every detail row.
-        // Use it once per order; do not add repeated copies together.
-        const uniqueTotals = [...new Set(order.TotalAmountValues.map(v => Math.round(v * 100) / 100))];
-        if (uniqueTotals.length > 1) {
-          throw new Error(`Order ${order.Order_No} has conflicting TotalAmount values (${uniqueTotals.join(', ')}). Please check the TNS source before posting.`);
+        // In this TNS layout TotalAmount is an order-level total, normally populated
+        // on the first row of an order and blank on its detail rows. Use the FIRST
+        // populated value once per order; never sum it across detail rows.
+        // If the source repeats a different value later, keep the first value and
+        // report a warning rather than aborting the entire ETL run.
+        const firstTotal = Math.round(order.TotalAmountValues[0] * 100) / 100;
+        const distinctTotals = [...new Set(order.TotalAmountValues.map(v => Math.round(v * 100) / 100))];
+        if (distinctTotals.length > 1) {
+          log(`WARNING: Order ${order.Order_No} has multiple populated TotalAmount values (${distinctTotals.join(', ')}). Using the first populated value ${firstTotal.toFixed(2)} once for this order.`);
         }
-        order.Sum_of_USD = uniqueTotals[0];
+        order.Sum_of_USD = firstTotal;
       } else {
+        // Fallback only when no populated TotalAmount exists for the order.
         order.Sum_of_USD = order.LineAmountSum;
       }
       order.Sum_of_GBP = order.Sum_of_USD / 1.3;
