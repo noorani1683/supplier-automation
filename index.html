@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supplier Invoice Automation Module - v4</title>
+    <title>Supplier Invoice Automation Module - v5</title>
     
     <!-- Excel workbook reader/writer and browser file download library -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -302,8 +302,8 @@
     if (value.startsWith('7')) return 'Decora';
     // C&C includes both RCG and CG order prefixes.
     if (value.startsWith('RCG') || value.startsWith('CG')) return 'C&C';
-    // SF includes both R2SF and RSF order prefixes.
-    if (value.startsWith('R2SF') || value.startsWith('RSF')) return 'SF';
+    // SF includes both SF and RSF order prefixes.
+    if (value.startsWith('SF') || value.startsWith('RSF')) return 'SF';
     return 'Other';
   }
   function readWorkbook(file) {
