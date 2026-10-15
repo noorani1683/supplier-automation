@@ -305,7 +305,7 @@
       .replace(/[\s\u200B-\u200D\uFEFF]/g, '')
       .toUpperCase();
     if (value.startsWith('7')) return 'Decora';
-    if (value.startsWith('CG') || value.startsWith('RCG')) return 'C&C';
+    if (value.startsWith('CG') || value.startsWith('RCG') || value.startsWith('R2CG')) return 'C&C';
     if (value.startsWith('SF') || value.startsWith('RSF')) return 'SF';
     return 'Other';
   }
