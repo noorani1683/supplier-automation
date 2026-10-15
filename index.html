@@ -371,8 +371,18 @@
     for (let r = headerIndex + 1; r < matrix.length; r++) {
       const row = matrix[r] || [];
       const rawOrder = row[columns.order];
-      if (rawOrder !== null && rawOrder !== undefined && String(rawOrder).trim() !== '') {
-        currentOrder = String(rawOrder).trim();
+      const rawOrderText = String(rawOrder ?? '').trim();
+      // TNS ends with a grand-total row labelled "Total". It contains the invoice
+      // totals (USD and M²), not a purchase order. Including it as an order doubles
+      // the grand totals in Pivot 1 and adds the same totals to an incorrect company
+      // bucket in Pivot 2. Skip summary/footer rows before forward-filling the order.
+      if (/^(grand\s*total|sub\s*total|total|合计|总计)$/i.test(rawOrderText)) {
+        skipped++;
+        log(`Skipped TNS summary/footer row ${r + 1} (${rawOrderText}).`);
+        continue;
+      }
+      if (rawOrderText !== '') {
+        currentOrder = rawOrderText;
       }
       const m2 = toNumber(row[columns.m2]);
       const amount = toNumber(row[columns.amount]);
@@ -539,7 +549,10 @@
       log(`Navision journal prepared: ${importRows.length} order-level rows.`);
 
       // SUMMARY OUTSTANDING: append one invoice-level summary row.
-      const summaryRows = sheetRows(summaryWb, summarySheet);
+      const summaryRows = sheetRows(summaryWb, summarySheet)
+        .filter(r => String(r['Invoice'] ?? '').trim() !== invoiceName);
+      // Write exactly one current row for this invoice, sourced from the same
+      // Pivot 1/Pivot 2 aggregates displayed on the dashboard.
       summaryRows.push({
         'Invoice': sanitizeValue(invoiceName),
         'USD': roundMoney(totals.usd),
