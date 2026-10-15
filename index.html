@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Supplier Invoice Automation Module</title>
+    <title>Supplier Invoice Automation Module - v4</title>
     
     <!-- Excel workbook reader/writer and browser file download library -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -300,8 +300,10 @@
   function companyFor(orderNo) {
     const value = String(orderNo).trim().toUpperCase();
     if (value.startsWith('7')) return 'Decora';
-    if (value.startsWith('CG')) return 'C&C';
-    if (value.startsWith('RSF')) return 'SF';
+    // C&C includes both RCG and CG order prefixes.
+    if (value.startsWith('RCG') || value.startsWith('CG')) return 'C&C';
+    // SF includes both R2SF and RSF order prefixes.
+    if (value.startsWith('R2SF') || value.startsWith('RSF')) return 'SF';
     return 'Other';
   }
   function readWorkbook(file) {
@@ -548,11 +550,24 @@
       const newImportsWb = buildWorkbook(importRows, importsSheet);
       log(`Navision journal prepared: ${importRows.length} order-level rows.`);
 
-      // SUMMARY OUTSTANDING: append one invoice-level summary row.
-      const summaryRows = sheetRows(summaryWb, summarySheet)
-        .filter(r => String(r['Invoice'] ?? '').trim() !== invoiceName);
-      // Write exactly one current row for this invoice, sourced from the same
-      // Pivot 1/Pivot 2 aggregates displayed on the dashboard.
+      // SUMMARY OUTSTANDING: canonicalise header variants (including trailing
+      // spaces/line breaks) so GBP and Invoice are written into the expected
+      // columns rather than creating near-duplicate columns.
+      const rawSummaryRows = sheetRows(summaryWb, summarySheet);
+      const canonicalSummaryKey = key => {
+        const h = normalizeHeader(key);
+        if (h === 'invoice') return 'Invoice';
+        if (h === 'usd') return 'USD';
+        if (h === 'todaysrate13' || h === 'todayrate13' || h === 'rate13') return "Today's Rate 1.3";
+        if (h === 'decoraelementusd' || h === 'decoraelement') return 'Decora Element (USD)';
+        return String(key ?? '').trim();
+      };
+      const summaryRows = rawSummaryRows.map(row => {
+        const canonical = {};
+        for (const [key, value] of Object.entries(row)) canonical[canonicalSummaryKey(key)] = value;
+        return canonical;
+      }).filter(r => String(r['Invoice'] ?? '').trim() !== invoiceName);
+      // Exactly one row per invoice, sourced from Pivot 1 and Pivot 2.
       summaryRows.push({
         'Invoice': sanitizeValue(invoiceName),
         'USD': roundMoney(totals.usd),
