@@ -298,11 +298,14 @@
     return null;
   }
   function companyFor(orderNo) {
-    const value = String(orderNo).trim().toUpperCase();
+    // Normalize leading/trailing, embedded, and invisible whitespace before testing prefixes.
+    // This ensures both the direct and R-prefixed order families land in the same company.
+    const value = String(orderNo ?? '')
+      .normalize('NFKC')
+      .replace(/[\s\u200B-\u200D\uFEFF]/g, '')
+      .toUpperCase();
     if (value.startsWith('7')) return 'Decora';
-    // C&C includes both RCG and CG order prefixes.
-    if (value.startsWith('RCG') || value.startsWith('CG')) return 'C&C';
-    // SF includes both SF and RSF order prefixes.
+    if (value.startsWith('CG') || value.startsWith('RCG')) return 'C&C';
     if (value.startsWith('SF') || value.startsWith('RSF')) return 'SF';
     return 'Other';
   }
